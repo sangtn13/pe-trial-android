@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -76,6 +77,7 @@ fun LandListScreen(
                 value = searchText,
                 onValueChange = { searchText = it },
                 label = { Text("Search by name or address") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -110,7 +112,7 @@ fun LandItem(land: Land, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(150.dp)
+            .height(130.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
@@ -126,13 +128,13 @@ fun LandItem(land: Land, onClick: () -> Unit) {
                 text = "Address: ${land.address}",
                 fontSize = 14.sp,
                 color = Color.Gray,
-                maxLines = 2
+                maxLines = 1
             )
             Text(
                 text = "Details: ${land.details}",
                 fontSize = 14.sp,
                 color = Color.DarkGray,
-                maxLines = 2
+                maxLines = 1
             )
         }
     }

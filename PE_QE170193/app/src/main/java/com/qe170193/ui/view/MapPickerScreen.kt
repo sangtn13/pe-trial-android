@@ -3,10 +3,9 @@ package com.qe170193.ui.view
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -20,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
@@ -31,7 +29,7 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @OptIn(ExperimentalMaterial3Api::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "UnrememberedMutableState")
 @Composable
 fun MapPickerScreen(navController: NavController) {
     val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
@@ -40,6 +38,7 @@ fun MapPickerScreen(navController: NavController) {
     var selectedLocation by remember {
         mutableStateOf(savedStateHandle?.get<LatLng>("selected_location") ?: defaultLocation)
     }
+    var tempLocation by remember { mutableStateOf(selectedLocation) }
     var isOkEnabled by remember { mutableStateOf(false) }
 
     val cameraPositionState = rememberCameraPositionState {
@@ -48,7 +47,7 @@ fun MapPickerScreen(navController: NavController) {
 
     LaunchedEffect(Unit) {
         savedStateHandle?.get<LatLng>("selected_location")?.let { latLng ->
-            selectedLocation = latLng
+            tempLocation = latLng
             isOkEnabled = true
             cameraPositionState.move(CameraUpdateFactory.newLatLng(latLng))
         }
@@ -62,36 +61,38 @@ fun MapPickerScreen(navController: NavController) {
                     IconButton(onClick = { navController.navigateUp() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            selectedLocation = tempLocation
+                            savedStateHandle?.set("selected_location", selectedLocation)
+                            navController.popBackStack()
+                        },
+                        enabled = isOkEnabled
+                    ) {
+                        Icon(Icons.Default.Check, contentDescription = "Save Location")
+                    }
                 }
             )
-        },
-        bottomBar = {
-            Button(
-                onClick = {
-                    savedStateHandle?.set("selected_location", selectedLocation)
-                    navController.popBackStack()
-                },
-                modifier = Modifier.width(100.dp).padding(16.dp),
-                enabled = isOkEnabled
-            ) {
-                Text("OK")
-            }
         }
-    ) {
+    ) { paddingValues ->
         GoogleMap(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
             cameraPositionState = cameraPositionState,
             onMapClick = { latLng ->
-                selectedLocation = latLng
+                tempLocation = latLng
                 isOkEnabled = true
-                savedStateHandle?.set("selected_location", latLng)
                 cameraPositionState.move(CameraUpdateFactory.newLatLng(latLng))
             }
         ) {
-            Marker(state = MarkerState(position = selectedLocation), title = "Selected Location")
+            Marker(state = MarkerState(position = tempLocation), title = "Selected Location")
         }
     }
 }
+
 
 
 

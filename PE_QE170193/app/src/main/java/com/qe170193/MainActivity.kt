@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.remember
 import androidx.navigation.compose.rememberNavController
+import com.qe170193.data.seed.LandSeeder
 import com.qe170193.ui.theme.PE_QE170193Theme
 import com.qe170193.ui.viewmodel.LandViewModel
 
@@ -16,6 +17,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PE_QE170193Theme {
+                LandSeeder.seed(this)
+
                 val viewModel = remember { LandViewModel(this) }
                 val navController = rememberNavController()
 

@@ -54,7 +54,10 @@ fun AddEditLandScreen(
     var priceError by remember { mutableStateOf(false) }
     var addressError by remember { mutableStateOf(false) }
     var detailError by remember { mutableStateOf(false) }
+    var latitudeError by remember { mutableStateOf(false) }
+    var longitudeError by remember { mutableStateOf(false) }
     var locationError by remember { mutableStateOf(false) }
+
 
     LaunchedEffect(navController.currentBackStackEntry?.savedStateHandle?.get<LatLng>("selected_location")) {
         navController.currentBackStackEntry?.savedStateHandle?.get<LatLng>("selected_location")?.let { latLng ->
@@ -98,10 +101,12 @@ fun AddEditLandScreen(
             )
             if (nameError) Text("Name cannot be empty", color = MaterialTheme.colorScheme.error)
 
+            Spacer(modifier = Modifier.padding(8.dp))
+
             OutlinedTextField(
                 value = price,
                 onValueChange = {
-                    if (it.all { char -> char.isDigit() || char == '.' }) {
+                    if (it.isEmpty() || it.all { char -> char.isDigit() || char == '.' }) {
                         price = it
                         priceError = it.isBlank()
                     }
@@ -112,6 +117,8 @@ fun AddEditLandScreen(
                 modifier = Modifier.fillMaxWidth()
             )
             if (priceError) Text("Price must be a valid number", color = MaterialTheme.colorScheme.error)
+
+            Spacer(modifier = Modifier.padding(8.dp))
 
             OutlinedTextField(
                 value = address,
@@ -125,6 +132,8 @@ fun AddEditLandScreen(
             )
             if (addressError) Text("Address cannot be empty", color = MaterialTheme.colorScheme.error)
 
+            Spacer(modifier = Modifier.padding(8.dp))
+
             OutlinedTextField(
                 value = detail,
                 onValueChange = {
@@ -137,24 +146,39 @@ fun AddEditLandScreen(
             )
             if (detailError) Text("Details cannot be empty", color = MaterialTheme.colorScheme.error)
 
+            Spacer(modifier = Modifier.padding(8.dp))
+
             OutlinedTextField(
                 value = latitude,
-                onValueChange = {},
+                onValueChange = {
+                    if (it.isEmpty() || it.toDoubleOrNull() != null) {
+                        latitude = it
+                        latitudeError = it.isBlank() || it.toDoubleOrNull()?.let { lat -> lat !in -90.0..90.0 } ?: true
+                    }
+                },
                 label = { Text("Latitude") },
-                readOnly = true,
-                isError = locationError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = latitudeError,
                 modifier = Modifier.fillMaxWidth()
             )
+            if (latitudeError) Text("Latitude should be between -90 and 90", color = MaterialTheme.colorScheme.error)
+
+            Spacer(modifier = Modifier.padding(8.dp))
 
             OutlinedTextField(
                 value = longitude,
-                onValueChange = {},
+                onValueChange = {
+                    if (it.isEmpty() || it.toDoubleOrNull() != null) {
+                        longitude = it
+                        longitudeError = it.isBlank() || it.toDoubleOrNull()?.let { lon -> lon !in -180.0..180.0 } ?: true
+                    }
+                },
                 label = { Text("Longitude") },
-                readOnly = true,
-                isError = locationError,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                isError = longitudeError,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (locationError) Text("Please select a location", color = MaterialTheme.colorScheme.error)
+            if (longitudeError) Text("Longitude should be between -180 and 180", color = MaterialTheme.colorScheme.error)
 
             Spacer(modifier = Modifier.padding(8.dp))
 
@@ -186,7 +210,9 @@ fun AddEditLandScreen(
                     priceError = price.isBlank()
                     addressError = address.isBlank()
                     detailError = detail.isBlank()
-                    locationError = latitude.isBlank() || longitude.isBlank()
+                    latitudeError = latitude.isBlank() || latitude.toDoubleOrNull()?.let { it !in -90.0..90.0 } ?: true
+                    longitudeError = longitude.isBlank() || longitude.toDoubleOrNull()?.let { it !in -180.0..180.0 } ?: true
+                    locationError = latitudeError || longitudeError
 
                     if (!(nameError || priceError || addressError || detailError || locationError)) {
                         val newLand = Land(
@@ -206,6 +232,7 @@ fun AddEditLandScreen(
             ) {
                 Text("Save")
             }
+
         }
     }
 }
