@@ -53,7 +53,7 @@ This is a **Real Estate Land Management Application** developed using **Android 
 ### 🛠️ Steps to Run the Project
 1️⃣ Clone this repository:  
    ```sh
-   git clone https://github.com/SangTran13/pe-trial-android.git
+   git clone https://github.com/sangtn13/pe-trial-android.git
 2️⃣ Open the project in Android Studio.
 3️⃣ Sync Gradle and install dependencies.
 4️⃣ Obtain a Google Maps API Key from Google Cloud Console.
@@ -93,7 +93,7 @@ The Google Maps API key is required for displaying maps.
 👨‍💻 Author
 Sang Tran Ngoc
 📧 Email: tranngocsang147877@gmail.com
-🔗 GitHub: github.com/sangtran13
+🔗 GitHub: github.com/sangtn13
 📜 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
